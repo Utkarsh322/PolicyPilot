@@ -1,5 +1,3 @@
-[client]
-showDeployButton = false
-
 [server]
 fileWatcherType = "none"
+
