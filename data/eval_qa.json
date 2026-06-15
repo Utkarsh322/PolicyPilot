@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "question": "How many annual leave days do full-time employees get per year?",
+    "answer": "Full-time employees are eligible for 20 working days of paid Annual Leave per calendar year, which accrues monthly at a rate of 1.67 days.",
+    "document": "leave_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": 2,
+    "question": "What is the maximum number of annual leave days I can carry forward?",
+    "answer": "A maximum of 5 unused annual leave days can be carried forward to the next calendar year and must be utilized before March 31st.",
+    "document": "leave_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": 3,
+    "question": "Do I need to submit a doctor's note for sick leave?",
+    "answer": "Yes, if you are absent due to illness for more than 2 consecutive business days, you must submit a valid medical certificate.",
+    "document": "leave_policy.pdf",
+    "page": 2
+  },
+  {
+    "id": 4,
+    "question": "How much paid maternity leave do female employees receive?",
+    "answer": "Female employees with at least 12 months of continuous service are entitled to 12 weeks of fully paid Maternity Leave.",
+    "document": "leave_policy.pdf",
+    "page": 2
+  },
+  {
+    "id": 5,
+    "question": "How many days of paid bereavement leave do I get for immediate family?",
+    "answer": "Employees are entitled to up to 5 consecutive business days of paid Bereavement Leave for immediate family members.",
+    "document": "leave_policy.pdf",
+    "page": 3
+  },
+  {
+    "id": 6,
+    "question": "What is the standard hardware kit allocated to employees upon joining?",
+    "answer": "A standard hardware kit consists of one high-performance laptop (16-inch MacBook Pro or ThinkPad T16), a 27-inch external monitor, and a wireless keyboard and mouse.",
+    "document": "it_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": 7,
+    "question": "How often does the company replace laptops?",
+    "answer": "Laptops are scheduled for hardware replacement every 3 years of active service.",
+    "document": "it_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": 8,
+    "question": "Am I allowed to install software myself on my company laptop?",
+    "answer": "No, employees must not install unauthorized or unlicensed software. All software requests must go through the IT Service Catalog.",
+    "document": "it_policy.pdf",
+    "page": 2
+  },
+  {
+    "id": 9,
+    "question": "What are the rules for choosing a password for my corporate accounts?",
+    "answer": "Passwords must be at least 14 characters, combining uppercase, lowercase, numbers, and special characters, and must be updated every 90 days. MFA is mandatory.",
+    "document": "it_policy.pdf",
+    "page": 2
+  },
+  {
+    "id": 10,
+    "question": "Within how much time should a lost or stolen laptop be reported?",
+    "answer": "A lost or stolen device must be reported to the IT Security team at security@policypilot.com within 2 hours of discovery.",
+    "document": "it_policy.pdf",
+    "page": 3
+  },
+  {
+    "id": 11,
+    "question": "Can I book a business class flight for domestic business travel?",
+    "answer": "No, business class bookings are strictly prohibited for domestic flights. All domestic flights must be economy class.",
+    "document": "expense_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": 12,
+    "question": "What is the domestic hotel reimbursement rate limit per night?",
+    "answer": "The maximum allowable domestic room rate is $150 per night excluding taxes.",
+    "document": "expense_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": 13,
+    "question": "What is the international meal per diem rate?",
+    "answer": "The international per diem rate for meals and incidentals is $80 per day.",
+    "document": "expense_policy.pdf",
+    "page": 2
+  },
+  {
+    "id": 14,
+    "question": "What is the deadline for submitting expense reports in Concur?",
+    "answer": "All expense claims must be submitted in the Concur portal within 30 days of incurring the expense.",
+    "document": "expense_policy.pdf",
+    "page": 2
+  },
+  {
+    "id": 15,
+    "question": "For what transaction amount is an itemized receipt mandatory?",
+    "answer": "Itemized receipts are mandatory for all individual transactions above $25.",
+    "document": "expense_policy.pdf",
+    "page": 2
+  },
+  {
+    "id": 16,
+    "question": "How does the company handle conflicts of interest?",
+    "answer": "Employees must declare any external activities, relationships, or financial investments that could influence judgment via the HR portal. Board memberships require Ethics Committee approval.",
+    "document": "code_of_conduct.pdf",
+    "page": 1
+  },
+  {
+    "id": 17,
+    "question": "Can I accept a gift worth $100 from a supplier?",
+    "answer": "No, gifts valued above $50 from clients or suppliers must be declined or declared to the Compliance Team at compliance@policypilot.com.",
+    "document": "code_of_conduct.pdf",
+    "page": 2
+  },
+  {
+    "id": 18,
+    "question": "How can I report an ethical violation anonymously?",
+    "answer": "You can report violations anonymously via the Compliance Hotline at 1-800-555-CODE or by email to ethics@policypilot.com.",
+    "document": "code_of_conduct.pdf",
+    "page": 3
+  },
+  {
+    "id": 19,
+    "question": "What is the minimum number of days I must work from the office in the hybrid model?",
+    "answer": "Employees are required to work from the corporate office for a minimum of 2 days per week, and can work from home up to 3 days per week.",
+    "document": "wfh_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": 20,
+    "question": "How much Internet allowance does the company reimburse per month?",
+    "answer": "The company offers a recurring monthly internet allowance of $50 upon submission of the monthly bill by the 5th of the following month.",
+    "document": "wfh_policy.pdf",
+    "page": 2
+  }
+]

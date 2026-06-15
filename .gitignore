@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Local configuration & Secrets
+.env
+.env.local
+
+# Streamlit local state
+.streamlit/*
+!.streamlit/config.toml
+
+# Local databases & user data
+data/chromadb/
+data/policies/
+test_policy_auto.pdf
+
+# IDE and System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
