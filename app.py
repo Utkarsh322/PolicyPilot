@@ -118,67 +118,157 @@ st.markdown("""
 
 
 # Helper function to query backend
-def query_backend(question, history, search_mode, threshold):
-    payload = {
-        "question": question,
-        "history": history,
-        "search_mode": search_mode,
-        "threshold": threshold
-    }
+# Helper to lazy-load local pipeline in case backend is offline/unreachable
+@st.cache_resource
+def get_local_pipeline():
     try:
-        response = requests.post(f"{API_URL}/query", json=payload, timeout=30)
+        from src.pipeline import RAGPipeline
+        return RAGPipeline()
+    except Exception as e:
+        st.error(f"Failed to initialize local in-process pipeline: {e}")
+        return None
+
+# Helper to automatically generate default policy PDFs if the folder is empty
+def check_and_generate_defaults():
+    policies_dir = Path("data/policies")
+    if not policies_dir.exists() or not any(policies_dir.glob("*.pdf")):
+        try:
+            from scripts.generate_pdfs import POLICIES, create_policy_pdf
+            st.info("No policy documents found in library. Generating default corporate policies...")
+            for filename, data in POLICIES.items():
+                create_policy_pdf(filename, data["title"], data["content"])
+            st.success("Default corporate policies generated successfully!")
+            
+            # Immediately trigger indexing locally
+            pipeline = get_local_pipeline()
+            if pipeline:
+                with st.status("Indexing documents into local database...", expanded=True) as status:
+                    success = pipeline.reindex()
+                    if success:
+                        status.update(label="Initial indexing completed successfully!", state="complete")
+                    else:
+                        status.update(label="Initial indexing failed.", state="error")
+        except Exception as e:
+            st.error(f"Error during initial policy setup: {e}")
+
+# Run the check on application load
+check_and_generate_defaults()
+
+
+# Helper function to query backend (with local in-process fallback)
+def query_backend(question, history, search_mode, threshold):
+    try:
+        payload = {
+            "question": question,
+            "history": history,
+            "search_mode": search_mode,
+            "threshold": threshold
+        }
+        response = requests.post(f"{API_URL}/query", json=payload, timeout=5)
         if response.status_code == 200:
             return response.json()
         else:
             st.error(f"Error {response.status_code}: {response.text}")
             return None
-    except Exception as e:
-        st.error(f"Could not connect to API server at {API_URL}. Make sure it is running.")
+    except Exception:
+        # Fallback to local execution
+        pipeline = get_local_pipeline()
+        if pipeline:
+            try:
+                return pipeline.answer_question(
+                    query=question,
+                    history=history,
+                    search_mode=search_mode,
+                    threshold=threshold
+                )
+            except Exception as e:
+                st.error(f"Local query processing failed: {e}")
         return None
 
-# Helper to fetch system status
+# Helper to fetch system status (with local in-process fallback)
 def fetch_status():
     try:
-        res = requests.get(f"{API_URL}/status", timeout=5)
+        res = requests.get(f"{API_URL}/status", timeout=2)
         if res.status_code == 200:
             return res.json()
     except Exception:
         pass
-    return None
+        
+    # Local fallback status retrieval
+    try:
+        policies_dir = Path("data/policies")
+        pdf_docs = [f.name for f in policies_dir.glob("*.pdf")] if policies_dir.exists() else []
+        pipeline = get_local_pipeline()
+        chunk_count = len(pipeline.retriever.all_documents) if (pipeline and pipeline.retriever) else 0
+        from src import config
+        return {
+            "document_count": len(pdf_docs),
+            "documents": pdf_docs,
+            "chunk_count": chunk_count,
+            "llm_provider": pipeline.generator.provider if (pipeline and pipeline.generator) else config.LLM_PROVIDER,
+            "confidence_threshold": config.CONFIDENCE_THRESHOLD,
+            "hybrid_weights": {
+                "semantic_weight": config.HYBRID_SEMANTIC_WEIGHT,
+                "keyword_weight": config.HYBRID_KEYWORD_WEIGHT
+            },
+            "is_local_fallback": True
+        }
+    except Exception:
+        return None
 
-# Helper to reindex
+# Helper to reindex (with local in-process fallback)
 def trigger_reindex():
     try:
         res = requests.post(f"{API_URL}/reindex", timeout=120)
         if res.status_code == 200:
             return res.json()
-    except Exception as e:
-        st.error(f"Re-indexing failed: {e}")
+    except Exception:
+        pipeline = get_local_pipeline()
+        if pipeline:
+            success = pipeline.reindex()
+            return {"success": success, "message": "Local database re-indexed successfully."}
     return None
 
-# Helper to delete document
+# Helper to delete document (with local in-process fallback)
 def delete_document(filename):
     try:
         res = requests.delete(f"{API_URL}/document/{filename}", timeout=60)
         if res.status_code == 200:
             return res.json()
-        else:
-            st.error(f"Failed to delete: {res.text}")
-    except Exception as e:
-        st.error(f"Error connecting to backend: {e}")
+    except Exception:
+        policies_dir = Path("data/policies")
+        file_path = policies_dir / filename
+        if file_path.exists():
+            try:
+                file_path.unlink()
+                pipeline = get_local_pipeline()
+                if pipeline:
+                    success = pipeline.reindex()
+                    return {"success": success, "message": f"Local document '{filename}' deleted and re-indexed."}
+            except Exception as e:
+                st.error(f"Failed to delete local document: {e}")
     return None
 
-# Helper to upload document
+# Helper to upload document (with local in-process fallback)
 def upload_document(file_bytes, filename):
     try:
         files = {"file": (filename, file_bytes, "application/pdf")}
         res = requests.post(f"{API_URL}/upload", files=files, timeout=120)
         if res.status_code == 200:
             return res.json()
-        else:
-            st.error(f"Failed to upload: {res.text}")
-    except Exception as e:
-        st.error(f"Error connecting to backend: {e}")
+    except Exception:
+        policies_dir = Path("data/policies")
+        policies_dir.mkdir(parents=True, exist_ok=True)
+        file_path = policies_dir / filename
+        try:
+            with open(file_path, "wb") as buffer:
+                buffer.write(file_bytes)
+            pipeline = get_local_pipeline()
+            if pipeline:
+                success = pipeline.reindex()
+                return {"success": success, "message": f"Local document '{filename}' uploaded and indexed."}
+        except Exception as e:
+            st.error(f"Failed to upload local document: {e}")
     return None
 
 
@@ -227,6 +317,8 @@ st.sidebar.markdown("### 📂 Policy Document Library")
 sys_status = fetch_status()
 
 if sys_status:
+    if sys_status.get("is_local_fallback"):
+        st.sidebar.info("🤖 Self-Contained Local Mode (FastAPI Offline)")
     st.sidebar.write(f"**Indexed Documents:** {sys_status['document_count']}")
     st.sidebar.write(f"**Total Chunks:** {sys_status['chunk_count']}")
     
